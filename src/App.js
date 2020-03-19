@@ -1,51 +1,91 @@
-import React, { useState, useEffect } from 'react';
-import './Task.css';
-import { firestore } from 'firebase';
+import React, { useState, useEffect } from 'react'
+import { firestore } from './index'
+import 'firebase/firestore'
+import Task from './Task'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Button } from 'react-bootstrap';
 
 function App() {
-  const [task,setTask] = useState([
-    { id: 1,name: 'do homework'},
-    { id: 2,name: 'write node js'}
-  ])
-  
-useEffect (() => {})
 
-const retriveData = () => {
-  firestore.Collection("tasks").onSnapshotS ( (snapshot)) =>{
-console.log(snapshot.docs)
-let myTask = snapshot.docs.map{ d => {
-  const {id,name} = d.data()
-  console.log (id,name)
-  return {id,name}
-}}
-  setTask
-  })
-}
+  const [tasks, setTasks] = useState([
+    { id: 1, name: "do homework" },
+    { id: 2, name: "write node js" }
+  ]);
 
-const deleteTask = (id) => {
-  firestore.collection("task").docs(id+'').delete()
-}
+  const [name, setName] = useState('')
 
+  useEffect(() => {
+    retriverData()
+  }, [])
 
-const renderTask = () => {
-  console.log(task)
-  if (tasks && tasks.length) {
-    return tasks.map((task,index) =>{
-      return (
-        <li key = {index} >
-          {task.id} : {task.name}
-
-          
-          <button onClick = { () => deleteTask{task.id}}> delete </button>
-          <button onClick = { () => deleteTask{task.id}}> delete </button>
-
-          
-        </li>
-      )
+  const retriverData = () => {
+    firestore.collection("task").onSnapshot((snapshot) => {
+      console.log(snapshot.docs)
+      let mytask = snapshot.docs.map(d => {
+        const { id, name } = d.data()
+        return { id, name }
+      })
+      setTasks(mytask)
     })
-  } else {
-    return <li> No task </li>
   }
-}
 
+  const addTask = () => {
+    let id = (tasks.length === 0) ? 1 : tasks[tasks.length - 1].id + 1
+    firestore.collection("task").doc(id.toString()).set({ id, name })
+  }
+
+
+  const renderTask = () => {
+    if (tasks && tasks.length) {
+      return (tasks.map((text, index) => {
+        return (
+          <Task key={index} task={text} deleteTask={deleteTask} editTask={editTask} />
+        )
+      }
+      )
+      )
+    }
+    else
+      return (<ll> No task </ll>)
+  }
+  const editTask = (id) => {
+    firestore.collection("task").doc(id + '').set({ id, name })
+  }
+  const deleteTask = (id) => {
+    firestore.collection("task").doc(id + '').delete()
+  }
+
+  return (
+    <div>
+      <div>
+        <input type="text" name="name" onChange={(e) => setName(e.target.value)} />
+        <div>
+          <Button variant="outline-primary" onClick={addTask}>Add</Button>
+        </div>
+      </div>
+      <div className="d-flex justify-content-center">
+        {
+          renderTask()
+        }
+      </div>
+    </div>
+  );
+}
 export default App;
+
+//Hello
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

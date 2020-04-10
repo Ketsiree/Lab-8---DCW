@@ -7,12 +7,22 @@ import { Button } from 'react-bootstrap';
 
 function App() {
 
-  const [tasks, setTasks] = useState([
-    { id: 1, name: "do homework" },
-    { id: 2, name: "write node js" }
+  const [task, setTask] = useState([
+    { id: 1, name: "Peempos", 
+    lastname: "Sinla",
+    date: "24-04-20", 
+    time:"18.00"},
+    { id: 2, 
+      name: "Ketsiree",
+      lastname: "Tantiwit",
+      date: "24-04-20", 
+      time:"18.00" }
   ]);
 
-  const [name, setName] = useState('')
+  const [name, setName] = useState('');
+  const [lastname, setLastname] = useState('');
+  const [date,setDate] = useState('');
+  const [time,setTime] = useState('');
 
   useEffect(() => {
     retriverData()
@@ -22,22 +32,22 @@ function App() {
     firestore.collection("task").onSnapshot((snapshot) => {
       console.log(snapshot.docs)
       let mytask = snapshot.docs.map(d => {
-        const { id, name } = d.data()
-        return { id, name }
+        const { id, name,lastname,date,time} = d.data()
+        return { id, name,lastname,date,time }
       })
-      setTasks(mytask)
+      setTask(mytask)
     })
   }
 
   const addTask = () => {
-    let id = (tasks.length === 0) ? 1 : tasks[tasks.length - 1].id + 1
-    firestore.collection("task").doc(id.toString()).set({ id, name })
+    let id = (task.length === 0) ? 1 : task[task.length - 1].id + 1
+    firestore.collection("task").doc(id+ ' ').set({id,name,lastname,date,time})
   }
 
 
   const renderTask = () => {
-    if (tasks && tasks.length) {
-      return (tasks.map((text, index) => {
+    if (task && task.length) {
+      return (task.map((text, index) => {
         return (
           <Task key={index} task={text} deleteTask={deleteTask} editTask={editTask} />
         )
@@ -49,16 +59,39 @@ function App() {
       return (<ll> No task </ll>)
   }
   const editTask = (id) => {
-    firestore.collection("task").doc(id + '').set({ id, name })
+    firestore.collection("task").doc(id + ' ').set({id,name,lastname,date,time})
   }
   const deleteTask = (id) => {
-    firestore.collection("task").doc(id + '').delete()
+    firestore.collection("task").doc(id + ' ').delete()
   }
 
   return (
     <div>
       <div>
-        <input type="text" name="name" onChange={(e) => setName(e.target.value)} />
+        <tr>
+           <td>Name : </td>
+              <td>
+                  <input type="text" onChange={(e) => setName(e.target.value)} />
+              </td>
+        </tr>
+        <tr>
+           <td>Lastname : </td>
+              <td>
+                  <input type="text" onChange={(e) => setLastname(e.target.value)} />
+              </td>
+        </tr>
+        <tr>
+           <td>Date : </td>
+              <td>
+                  <input type="text" onChange={(e) => setDate(e.target.value)} />
+              </td>
+        </tr>
+        <tr>
+           <td>Time : </td>
+              <td>
+                  <input type="text" onChange={(e) => setTime(e.target.value)} />
+              </td>
+        </tr>
         <div>
           <Button variant="outline-primary" onClick={addTask}>Add</Button>
         </div>
@@ -74,6 +107,8 @@ function App() {
 export default App;
 
 //Hello
+
+
 
 
 
